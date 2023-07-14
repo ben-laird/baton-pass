@@ -1,0 +1,7 @@
+#: schema ./rsw.schema.json
+
+[[crates]]
+scope = "typelaunch-turbo"
+name = "crate"
+out-dir = "dist"
+target = "bundler"

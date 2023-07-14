@@ -1,0 +1,8 @@
+{
+  "extends": "@typelaunch-turbo/tsconfig/tsconfig.lib",
+  "include": ["src", "test"],
+  "compilerOptions": {
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  }
+}

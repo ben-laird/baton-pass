@@ -1,0 +1,21 @@
+{
+  "name": "@typelaunch-turbo/docs",
+  "type": "module",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "lint": "tsc && rome check . && astro check",
+    "format": "rome format .",
+    "uncache": "rm -rf .turbo",
+    "clean": "rm -rf .turbo && rm -rf dist && rm -rf node_modules"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.4.0",
+    "astro": "^2.7.2"
+  }
+}

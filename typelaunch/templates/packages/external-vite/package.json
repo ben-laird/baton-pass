@@ -1,0 +1,37 @@
+{
+  "name": "@typelaunch-turbo/external-vite",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/external-vite.umd.cjs",
+  "module": "./dist/external-vite.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/external-vite.js",
+      "require": "./dist/external-vite.umd.cjs"
+    }
+  },
+  "scripts": {
+    "start": "vite",
+    "dev": "vitest",
+    "preview": "vite build --mode preview & vite preview",
+    "build:dev": "vite build --mode development",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cov": "vitest run --coverage",
+    "cov:watch": "vitest run --coverage",
+    "cov:detail": "vitest run --coverage && open-cli index.html",
+    "lint": "tsc && rome check .",
+    "format": "rome format .",
+    "uncache": "rm -rf .turbo",
+    "clean": "rm -rf .turbo && rm -rf dist && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "vite-plugin-solid": "^2.7.0"
+  },
+  "dependencies": {
+    "solid-js": "^1.7.7"
+  }
+}

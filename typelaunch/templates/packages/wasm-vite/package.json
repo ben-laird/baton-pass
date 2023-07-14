@@ -1,0 +1,39 @@
+{
+  "name": "@typelaunch-turbo/wasm-vite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/wasm-vite.js",
+  "module": "./dist/wasm-vite.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/wasm-vite.js",
+      "require": null
+    }
+  },
+  "scripts": {
+    "start": "vite",
+    "dev": "vitest",
+    "preview": "rsw build && vite build --mode preview & vite preview",
+    "build:dev": "rsw build && vite build --mode development",
+    "build": "rsw build && vite build",
+    "test": "vitest run && cargo test --manifest-path crate/Cargo.toml",
+    "test:watch": "vitest",
+    "cov": "vitest run --coverage",
+    "cov:watch": "vitest run --coverage",
+    "cov:detail": "vitest run --coverage && open-cli index.html",
+    "lint": "tsc && rome check src test && cargo clippy --manifest-path crate/Cargo.toml",
+    "format": "rome format src test --write & cargo clippy --fix --manifest-path crate/Cargo.toml --allow-dirty",
+    "uncache": "rm -rf .turbo .rsw",
+    "clean": "rm -rf .turbo dist node_modules crate/dist crate/target .rsw",
+    "rsw": "rsw"
+  },
+  "devDependencies": {
+    "vite-plugin-solid": "^2.7.0"
+  },
+  "dependencies": {
+    "@typelaunch-turbo/wasm-vite-rs": "workspace:^",
+    "solid-js": "^1.7.7"
+  }
+}

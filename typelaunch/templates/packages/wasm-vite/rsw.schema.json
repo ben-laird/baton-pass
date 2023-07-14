@@ -1,0 +1,116 @@
+{
+  "$id": "rsw.schema.json",
+  "title": "RSW schema",
+  "description": "A schema for rsw.toml files",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "description": "Profile name",
+      "type": "string"
+    },
+    "version": {
+      "description": "Profile version",
+      "type": "string"
+    },
+    "interval": {
+      "description": "The time interval (in ms) for file changes to trigger `wasm-pack build`",
+      "type": "integer",
+      "default": 50,
+      "exclusiveMinimum": 0
+    },
+    "cli": {
+      "description": "The package manager to use when running the link command",
+      "enum": ["npm", "yarn", "pnpm"],
+      "default": "npm"
+    },
+    "new": {
+      "description": "Options used when running `rsw new <<name>>`",
+      "type": "object",
+      "properties": {
+        "using": {
+          "description": "Which cli (and template set) to use when scaffolding a new project",
+          "enum": ["wasm-pack", "rsw", "user"],
+          "default": "wasm-pack"
+        },
+        "dir": {
+          "description": "Copy all files in this directory into the new project. Only necessary when `using = \"user\"`.",
+          "type": "string",
+          "default": "my-template"
+        }
+      }
+    },
+    "crates": {
+      "description": "Rust crate configurations",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "npm package/rust crate name (`name = \"crate\"` -> path = `./crate`)",
+            "type": "string"
+          },
+          "root": {
+            "description": "Path to the crate relative to this file",
+            "type": "string",
+            "default": "."
+          },
+          "link": {
+            "description": "Whether to run your preferred package manager's link command",
+            "type": "boolean",
+            "default": false
+          },
+          "target": {
+            "description": "The environment the generated npm package targets",
+            "enum": ["bundler", "nodejs", "web", "no-modules"],
+            "default": "web"
+          },
+          "scope": {
+            "description": "The scope/organization name of the package (`name: @rs/crate` -> `scope = rs`)",
+            "type": "string"
+          },
+          "out-dir": {
+            "description": "The directory to output the build to",
+            "type": "string",
+            "default": "pkg"
+          },
+          "watch": {
+            "description": "Settings for watch mode",
+            "type": "object",
+            "properties": {
+              "run": {
+                "description": "Whether to watch this crate when running `rsw watch`",
+                "type": "boolean",
+                "default": true
+              },
+              "profile": {
+                "description": "The Rust build profile to use when watching",
+                "enum": ["dev", "profiling"],
+                "default": "dev"
+              }
+            }
+          },
+          "build": {
+            "description": "Settings for build mode",
+            "type": "object",
+            "properties": {
+              "run": {
+                "description": "Whether to build this crate when running `rsw build`",
+                "type": "boolean",
+                "default": true
+              },
+              "profile": {
+                "description": "The Rust build profile to use when building",
+                "enum": ["release", "profiling"],
+                "default": "release"
+              }
+            }
+          }
+        },
+        "required": ["name"]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  }
+}

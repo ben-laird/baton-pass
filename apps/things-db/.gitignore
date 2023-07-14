@@ -1,0 +1,6 @@
+# Prisma Exclusions
+prisma/*
+!prisma/schema.prisma
+!prisma/migrations
+
+.env

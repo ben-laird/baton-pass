@@ -1,0 +1,17 @@
+{
+  "formatter": {
+    "indentStyle": "space",
+    "indentSize": 2
+  },
+  "files": {
+    "ignore": [
+      "dist",
+      "coverage",
+      ".turbo",
+      ".astro",
+      ".sveltekit",
+      "vite.config.ts-timestamp-*",
+      "crate/**"
+    ]
+  }
+}

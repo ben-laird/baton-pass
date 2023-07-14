@@ -1,0 +1,30 @@
+{
+  "folders": [
+    {
+      "name": "GraphQL",
+      "path": "packages/graphql"
+    },
+    {
+      "name": "Things DB",
+      "path": "apps/things-db"
+    },
+    {
+      "name": "Docs",
+      "path": "apps/docs"
+    },
+    {
+      "name": "Root",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "driver": "SQLite",
+        "name": "Things DB",
+        "database": "${workspaceFolder:Things DB}/prisma/main.sqlite"
+      }
+    ]
+  }
+}

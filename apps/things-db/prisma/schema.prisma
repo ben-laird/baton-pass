@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model BSSyncronyMetadata {
+  uuid  String? @id
+  value Bytes?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Meta {
+  key   String? @id
+  value String?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMArea {
+  uuid         String? @id
+  title        String?
+  visible      Int?
+  index        Int?
+  cachedTags   Bytes?
+  experimental Bytes?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMAreaTag {
+  areas String
+  tags  String
+
+  @@index([areas], map: "index_TMAreaTag_areas")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMChecklistItem {
+  uuid                 String? @id
+  userModificationDate Float?
+  creationDate         Float?
+  title                String?
+  status               Int?
+  stopDate             Float?
+  index                Int?
+  task                 String?
+  leavesTombstone      Int?
+  experimental         Bytes?
+
+  @@index([task], map: "index_TMChecklistItem_task")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMCommand {
+  uuid         String? @id
+  creationDate Float?
+  type         Int?
+  info         Bytes?
+
+  @@index([creationDate], map: "index_TMCommand_creationDate")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMContact {
+  uuid               String? @id
+  displayName        String?
+  firstName          String?
+  lastName           String?
+  emails             String?
+  appleAddressBookId String?
+  index              Int?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMMetaItem {
+  uuid  String? @id
+  value Bytes?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMSettings {
+  uuid                         String? @id
+  logInterval                  Int?
+  manualLogDate                Float?
+  groupTodayByParent           Int?
+  uriSchemeAuthenticationToken String?
+  experimental                 Bytes?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMTag {
+  uuid         String? @id
+  title        String?
+  shortcut     String?
+  usedDate     Float?
+  parent       String?
+  index        Int?
+  experimental Bytes?
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMTask {
+  uuid                             String? @id
+  leavesTombstone                  Int?
+  creationDate                     Float?
+  userModificationDate             Float?
+  type                             Int?
+  status                           Int?
+  stopDate                         Float?
+  trashed                          Int?
+  title                            String?
+  notes                            String?
+  notesSync                        Int?
+  cachedTags                       Bytes?
+  start                            Int?
+  startDate                        Int?
+  startBucket                      Int?
+  reminderTime                     Int?
+  lastReminderInteractionDate      Float?
+  deadline                         Int?
+  deadlineSuppressionDate          Int?
+  t2_deadlineOffset                Int?
+  index                            Int?
+  todayIndex                       Int?
+  todayIndexReferenceDate          Int?
+  area                             String?
+  project                          String?
+  heading                          String?
+  contact                          String?
+  untrashedLeafActionsCount        Int?
+  openUntrashedLeafActionsCount    Int?
+  checklistItemsCount              Int?
+  openChecklistItemsCount          Int?
+  rt1_repeatingTemplate            String?
+  rt1_recurrenceRule               Bytes?
+  rt1_instanceCreationStartDate    Int?
+  rt1_instanceCreationPaused       Int?
+  rt1_instanceCreationCount        Int?
+  rt1_afterCompletionReferenceDate Int?
+  rt1_nextInstanceStartDate        Int?
+  experimental                     Bytes?
+  repeater                         Bytes?
+  repeaterMigrationDate            Float?
+
+  @@index([rt1_repeatingTemplate], map: "index_TMTask_repeatingTemplate")
+  @@index([area], map: "index_TMTask_area")
+  @@index([heading], map: "index_TMTask_heading")
+  @@index([project], map: "index_TMTask_project")
+  @@index([stopDate], map: "index_TMTask_stopDate")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMTaskTag {
+  tasks String
+  tags  String
+
+  @@index([tasks], map: "index_TMTaskTag_tasks")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model TMTombstone {
+  uuid              String? @id
+  deletionDate      Float?
+  deletedObjectUUID String?
+
+  @@index([deletedObjectUUID], map: "index_TMTombstone_deletedObjectUUID")
+  @@ignore
+}
+
+model ThingsTouch_ExtensionCommandStore_Commands {
+  id   Int     @id @default(autoincrement())
+  type String?
+  body Bytes?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ThingsTouch_ExtensionCommandStore_Meta {
+  key   String? @id
+  value Bytes?
+
+  @@ignore
+}

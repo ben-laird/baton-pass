@@ -1,0 +1,30 @@
+{
+  "name": "@typelaunch-turbo/external-tsup",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "start": "vitest",
+    "dev": "vitest",
+    "build:dev": "tsup src",
+    "build": "tsup src --minify",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cov": "vitest run --coverage",
+    "cov:watch": "vitest run --coverage",
+    "cov:detail": "vitest run --coverage && open-cli index.html",
+    "lint": "tsc && rome check .",
+    "format": "rome format .",
+    "uncache": "rm -rf .turbo",
+    "clean": "rm -rf .turbo && rm -rf dist && rm -rf node_modules"
+  }
+}

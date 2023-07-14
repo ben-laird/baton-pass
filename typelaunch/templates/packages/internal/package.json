@@ -1,0 +1,21 @@
+{
+  "name": "@typelaunch-turbo/internal",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "start": "vitest",
+    "dev": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cov": "vitest run --coverage",
+    "cov:watch": "vitest run --coverage",
+    "cov:detail": "vitest run --coverage && open-cli index.html",
+    "lint": "tsc && rome check .",
+    "format": "rome format .",
+    "uncache": "rm -rf .turbo",
+    "clean": "rm -rf .turbo && rm -rf dist && rm -rf node_modules"
+  }
+}

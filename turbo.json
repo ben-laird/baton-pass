@@ -1,0 +1,66 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "**/.env.*local",
+    "tsup.config.ts",
+    "vitest.config.ts",
+    ".eslintrc.cjs",
+    ".prettierrc.cjs",
+    "packages/config/**"
+  ],
+  "pipeline": {
+    "start": {
+      "cache": false,
+      "persistent": true
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build:dev": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["^build:dev"],
+      "cache": true
+    },
+    "build": {
+      "outputs": ["dist/**"],
+      "dependsOn": ["^build"]
+    },
+    "preview": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+
+    "test": {
+      "dependsOn": ["^build:dev"]
+    },
+    "test:watch": {
+      "dependsOn": ["^build:dev"],
+      "persistent": true
+    },
+    "cov": {
+      "outputs": ["coverage/**"],
+      "dependsOn": ["^cov"]
+    },
+    "cov:watch": {
+      "outputs": ["coverage/**"],
+      "dependsOn": ["^cov:watch"],
+      "persistent": true
+    },
+
+    "lint": {
+      "dependsOn": ["^build:dev"]
+    },
+    "format": {
+      "dependsOn": ["^build:dev"]
+    },
+
+    "uncache": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "@typelaunch-turbo/wasm-tsup",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": null
+    }
+  },
+  "scripts": {
+    "start": "vitest",
+    "dev": "vitest",
+    "build:dev": "rsw build && tsup src",
+    "build": "rsw build && tsup src --minify",
+    "test": "vitest run && cargo test --manifest-path crate/Cargo.toml",
+    "test:watch": "vitest",
+    "cov": "vitest run --coverage",
+    "cov:watch": "vitest run --coverage",
+    "cov:detail": "vitest run --coverage && open-cli index.html",
+    "lint": "tsc && rome check src test && cargo clippy --manifest-path crate/Cargo.toml",
+    "format": "rome format src test --write & cargo clippy --fix --manifest-path crate/Cargo.toml --allow-dirty",
+    "uncache": "rm -rf .turbo .rsw",
+    "clean": "rm -rf .turbo dist node_modules crate/dist crate/target .rsw",
+    "rsw": "rsw"
+  },
+  "dependencies": {
+    "@typelaunch-turbo/wasm-tsup-rs": "workspace:^"
+  }
+}

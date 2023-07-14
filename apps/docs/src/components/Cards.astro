@@ -1,0 +1,26 @@
+---
+import { Card, CardGrid } from "@astrojs/starlight/components";
+---
+
+<CardGrid stagger>
+    <Card title="Update content" icon="pencil">
+        Edit <code>src/content/docs/index.mdx</code> to see this page change.
+    </Card>
+    <Card title="Add new content" icon="add-document">
+        Add Markdown or MDX files to <code>src/content/docs</code> to create new
+        pages.
+    </Card>
+    <Card title="Configure your site" icon="setting">
+        Edit your <code>sidebar</code> and other config in <code
+            >astro.config.ts</code
+        >.
+    </Card>
+    <Card title="Read the docs" icon="open-book">
+        Learn more in <a href="https://starlight.astro.build/"
+            >the Starlight Docs</a
+        >.
+    </Card>
+    <Card title="Welcome" icon="external">
+        Check out the external <a href="/welcome">welcome page</a>
+    </Card>
+</CardGrid>

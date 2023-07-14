@@ -1,0 +1,12 @@
+{
+  "name": "@typelaunch-turbo/tsconfig",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "uncache": "rm -rf .turbo",
+    "clean": "rm -rf .turbo && rm -rf node_modules",
+    "lint": "rome check .",
+    "format": "rome format ."
+  }
+}
