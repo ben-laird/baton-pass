@@ -5,6 +5,10 @@
       "path": "packages/graphql"
     },
     {
+      "name": "URL Shortcut",
+      "path": "apps/url-shortcut"
+    },
+    {
       "name": "Intermediary DB",
       "path": "apps/intermediary-db"
     },
