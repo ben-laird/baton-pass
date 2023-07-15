@@ -16,7 +16,8 @@
     "lint": "tsc && rome check .",
     "format": "rome format .",
     "uncache": "rm -rf .turbo",
-    "clean": "rm -rf .turbo dist node_modules"
+    "clean": "rm -rf .turbo dist node_modules",
+    "sync": "prisma generate"
   },
   "devDependencies": {
     "prisma": "^5.0.0"
