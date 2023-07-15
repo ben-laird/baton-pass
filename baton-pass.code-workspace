@@ -5,6 +5,10 @@
       "path": "packages/graphql"
     },
     {
+      "name": "Intermediary DB",
+      "path": "apps/intermediary-db"
+    },
+    {
       "name": "Things DB",
       "path": "apps/things-db"
     },
@@ -24,6 +28,12 @@
         "driver": "SQLite",
         "name": "Things DB",
         "database": "${workspaceFolder:Things DB}/prisma/main.sqlite"
+      },
+      {
+        "previewLimit": 50,
+        "driver": "SQLite",
+        "name": "Intermediary DB",
+        "database": "${workspaceFolder:Intermediary DB}/../intermediary-db/prisma/dev.db"
       }
     ]
   }
