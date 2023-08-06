@@ -17,5 +17,9 @@
     "format": "rome format .",
     "uncache": "rm -rf .turbo",
     "clean": "rm -rf .turbo dist node_modules"
+  },
+  "dependencies": {
+    "graphql-request": "^6.1.0",
+    "zod": "^3.21.4"
   }
 }
