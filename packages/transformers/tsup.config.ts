@@ -16,10 +16,6 @@ export default defineConfig(({ define }) => {
     return { name: buildMode, dts: true, clean: true };
   }
 
-  if (buildMode === "custom") {
-    return { name: buildMode, clean: true, dts: true };
-  }
-
   const inProduction = buildMode === "production";
 
   return {
@@ -27,13 +23,13 @@ export default defineConfig(({ define }) => {
     dts: true,
     clean: true,
     minify: inProduction,
+    bundle: inProduction,
     splitting: inProduction,
     treeshake: inProduction,
     format: inProduction ? ["cjs", "esm"] : "esm",
     entry: {
       core: "src/index.ts",
     },
-    noExternal: ["@baton-pass/gql-canvas"],
   };
 });
 

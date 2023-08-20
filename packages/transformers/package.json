@@ -1,12 +1,11 @@
 {
-  "name": "@baton-pass/url-cli",
-  "private": true,
+  "name": "@baton-pass/transformers",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": "dist/bin.js",
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -14,7 +13,7 @@
     }
   },
   "scripts": {
-    "start": "tsup src --define.mode development && dist/bin.js",
+    "start": "vitest",
     "dev": "vitest",
     "build:dev": "tsup src --define.mode development",
     "build": "tsup src --define.mode production",
@@ -27,12 +26,5 @@
     "format": "rome format .",
     "uncache": "rm -rf .turbo",
     "clean": "rm -rf .turbo && rm -rf dist && rm -rf node_modules"
-  },
-  "dependencies": {
-    "@baton-pass/gql-canvas": "workspace:^",
-    "chrono-node": "^2.6.4",
-    "date-fns": "^2.30.0",
-    "graphql-request": "^6.1.0",
-    "zod": "^3.21.4"
   }
 }

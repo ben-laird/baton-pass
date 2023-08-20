@@ -5,6 +5,10 @@
       "path": "packages/graphql"
     },
     {
+      "name": "Transformers",
+      "path": "packages/transformers"
+    },
+    {
       "name": "URL Shortcut",
       "path": "apps/url-shortcut"
     },
@@ -39,6 +43,7 @@
         "name": "Intermediary DB",
         "database": "${workspaceFolder:Intermediary DB}/../intermediary-db/prisma/dev.db"
       }
-    ]
+    ],
+    "typescript.tsdk": "Root/node_modules/typescript/lib",
   }
 }
