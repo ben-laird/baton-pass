@@ -1,5 +1,5 @@
 {
-  "name": "@typelaunch-turbo/cli",
+  "name": "@baton-pass/url-cli",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,10 +14,10 @@
     }
   },
   "scripts": {
-    "start": "tsup src && dist/bin.js",
+    "start": "tsup src --define.mode development && dist/bin.js",
     "dev": "vitest",
-    "build:dev": "tsup src",
-    "build": "tsup src --minify",
+    "build:dev": "tsup src --define.mode development",
+    "build": "tsup src --define.mode production",
     "test": "vitest run",
     "test:watch": "vitest",
     "cov": "vitest run --coverage",
@@ -27,5 +27,12 @@
     "format": "rome format .",
     "uncache": "rm -rf .turbo",
     "clean": "rm -rf .turbo && rm -rf dist && rm -rf node_modules"
+  },
+  "dependencies": {
+    "@baton-pass/gql-canvas": "workspace:^",
+    "chrono-node": "^2.6.4",
+    "date-fns": "^2.30.0",
+    "graphql-request": "^6.1.0",
+    "zod": "^3.21.4"
   }
 }
