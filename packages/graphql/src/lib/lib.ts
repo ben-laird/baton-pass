@@ -1,14 +1,18 @@
-import { GraphQLClient } from "graphql-request";
+import { GraphQLClient, Variables } from "graphql-request";
 import { z } from "zod";
 
-export interface GraphQLRequestNoParams<T> {
-  body: () => { q: string };
-  parser: (res: unknown) => T;
+export class GraphQLRequestNoParams<T> {
+  constructor(
+    readonly body: () => { q: string },
+    readonly parser: (res: unknown) => T,
+  ) {}
 }
 
-export interface GraphQLRequestWithParams<T, V> {
-  body: (variables: V) => { q: string; variables: V };
-  parser: (res: unknown) => T;
+export class GraphQLRequestWithParams<T, V> {
+  constructor(
+    readonly body: (variables: V) => { q: string; variables: V },
+    readonly parser: (res: unknown) => T,
+  ) {}
 }
 
 export type GraphQLRequest<T = unknown, V = unknown> =
@@ -16,12 +20,14 @@ export type GraphQLRequest<T = unknown, V = unknown> =
   | GraphQLRequestWithParams<T, V>;
 
 export interface GraphQLSchemaNoParams {
+  params: false;
   body: () => { q: string };
   schema: z.Schema;
 }
 
-export interface GraphQLSchemaWithParams<T = unknown> {
-  body: (variables: T) => { q: string; variables: T };
+export interface GraphQLSchemaWithParams<V = unknown> {
+  params: true;
+  body: (variables: V) => { q: string; variables: V };
   schema: z.Schema;
 }
 
@@ -44,9 +50,15 @@ export function schemaToRequest<S extends GraphQLSchemaWithParams<any>>(
 export function schemaToRequest(
   gqlSchema: GraphQLSchemaNoParams | GraphQLSchemaWithParams,
 ) {
-  const { body, schema } = gqlSchema;
+  if (!gqlSchema.params) {
+    return new GraphQLRequestNoParams(gqlSchema.body, (res) =>
+      gqlSchema.schema.parse(res),
+    );
+  }
 
-  return { body, parser: (u: unknown) => schema.parse(u) };
+  return new GraphQLRequestWithParams(gqlSchema.body, (res) =>
+    gqlSchema.schema.parse(res),
+  );
 }
 
 // Zod to safe req converter
@@ -67,37 +79,48 @@ export function schemaToSafeRequest<S extends GraphQLSchemaWithParams<any>>(
 export function schemaToSafeRequest(
   gqlSchema: GraphQLSchemaNoParams | GraphQLSchemaWithParams,
 ) {
-  const { body, schema } = gqlSchema;
+  if (!gqlSchema.params) {
+    return new GraphQLRequestNoParams(gqlSchema.body, (res) =>
+      gqlSchema.schema.safeParse(res),
+    );
+  }
 
-  return { body, parser: (u: unknown) => schema.safeParse(u) };
+  return new GraphQLRequestWithParams(gqlSchema.body, (res) =>
+    gqlSchema.schema.safeParse(res),
+  );
 }
 
 // Query executor
 
-type GQLVars = Record<string, unknown>;
-
-export interface QueryGQL<P extends GQLVars, R> {
+export interface QueryGQL<P extends Variables, R> {
   endpoint: string;
   token?: string;
   query: GraphQLRequest<R, P>;
 }
 
-export function queryGraphQL<P extends GQLVars, R>(params: QueryGQL<P, R>) {
+export function queryGraphQL<P extends Variables, R>(params: QueryGQL<P, R>) {
   const client = new GraphQLClient(params.endpoint).setHeader(
     "authorization",
     `Bearer ${params.token ?? "NO_TOKEN"}`,
   );
 
+  const req = params.query;
+
+  if (req instanceof GraphQLRequestNoParams) {
+    return {
+      async fire() {
+        const reqBody = req.body();
+
+        return req.parser(await client.request(reqBody.q));
+      },
+    } as { fire: () => Promise<R> };
+  }
+
   return {
     async fire(queryParams: P) {
-      const req = params.query.body(queryParams);
+      const { q, variables } = req.body(queryParams);
 
-      return params.query.parser(
-        await client.request(
-          req.q,
-          "variables" in req ? (req.variables as P) : undefined,
-        ),
-      );
+      return req.parser(await client.request<unknown, Variables>(q, variables));
     },
-  };
+  } as { fire: (queryParams: P) => Promise<R> };
 }

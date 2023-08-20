@@ -8,6 +8,7 @@ import { schemaToRequest, schemaToSafeRequest } from "./lib";
  * A pre-fabricated query for creating a Model.
  */
 export const bigModelQuery = schemaToRequest({
+  params: true,
   body: (variables: { id: number }) => {
     const courseBody = F.course.body();
     const moduleBody = F.module.body();
@@ -118,6 +119,7 @@ export const bigModelQuery = schemaToRequest({
 });
 
 export const smallModelQuery = schemaToRequest({
+  params: true,
   body: (variables: { id: number }) => ({
     q: gql`
       query SmallModelQuery($id: ID!) {
@@ -166,6 +168,7 @@ export const smallModelQuery = schemaToRequest({
 });
 
 export const quickAndDirtyQuery = schemaToSafeRequest({
+  params: true,
   body: (variables: { id: number }) => {
     const courseBody = F.course.body();
 
@@ -201,4 +204,22 @@ export const quickAndDirtyQuery = schemaToSafeRequest({
       }),
     })
     .transform(({ Model }) => Model.enrollments),
+});
+
+export const noVariableQuery = schemaToSafeRequest({
+  params: false,
+  body: () => ({
+    q: gql`
+      ${F.course.body().q}
+
+      query NoVariableQuery {
+        allCourses {
+          ...CourseFragment
+        }
+      }
+    `,
+  }),
+  schema: z.object({
+    allCourses: F.course.schema.array().nullable(),
+  }),
 });

@@ -8,6 +8,7 @@ import { subjectCodesVal } from "./subjects";
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a grade or a set of grades.
  */
 export const grades = {
+  params: false,
   body: () => ({
     q: gql`
       fragment GradesFragment on Grades {
@@ -38,6 +39,7 @@ export const grades = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for an enrollment.
  */
 export const enrollment = {
+  params: false,
   body: () => ({
     q: gql`
       fragment GradesFragment on Grades {
@@ -83,6 +85,7 @@ export const enrollment = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a course.
  */
 export const course = {
+  params: false,
   body: () => ({
     q: gql`
       fragment CourseFragment on Course {
@@ -133,6 +136,7 @@ export const course = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a module.
  */
 export const module = {
+  params: false,
   body: () => ({
     q: gql`
       fragment ModuleFragment on Module {
@@ -153,6 +157,7 @@ export const module = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a module item.
  */
 export const moduleItem = {
+  params: false,
   body: () => ({
     q: gql`
       fragment ModuleItemFragment on ModuleItem {
@@ -171,6 +176,7 @@ export const moduleItem = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a subheader.
  */
 export const subHeader = {
+  params: false,
   body: () => ({
     q: gql`
       fragment SubHeaderFragment on SubHeader {
@@ -189,6 +195,7 @@ export const subHeader = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a page.
  */
 export const page = {
+  params: false,
   body: () => ({
     q: gql`
       fragment PageFragment on Page {
@@ -213,6 +220,7 @@ export const page = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a file.
  */
 export const file = {
+  params: false,
   body: () => ({
     q: gql`
       fragment FileFragment on File {
@@ -235,6 +243,7 @@ export const file = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for an external tool.
  */
 export const extTool = {
+  params: false,
   body: () => ({
     q: gql`
       fragment ExtToolFragment on ExternalTool {
@@ -259,6 +268,7 @@ export const extTool = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a discussion.
  */
 export const discussion = {
+  params: false,
   body: () => ({
     q: gql`
       fragment FileFragment on File {
@@ -334,6 +344,7 @@ export const discussion = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a quiz.
  */
 export const quiz = {
+  params: false,
   body: () => ({
     q: gql`
       fragment QuizFragment on Quiz {
@@ -356,6 +367,7 @@ export const quiz = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for an external URL.
  */
 export const extUrl = {
+  params: false,
   body: () => ({
     q: gql`
       fragment ExtUrlFragment on ExternalUrl {
@@ -378,6 +390,7 @@ export const extUrl = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a module's external tool.
  */
 export const moduleExtTool = {
+  params: false,
   body: () => ({
     q: gql`
       fragment ModuleExtToolFragment on ModuleExternalTool {
@@ -398,6 +411,7 @@ export const moduleExtTool = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a rubric.
  */
 export const rubric = {
+  params: false,
   body: () => ({
     q: gql`
       fragment RubricFragment on Rubric {
@@ -432,6 +446,7 @@ export const rubric = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for a submission.
  */
 export const submission = {
+  params: false,
   body: () => ({
     q: gql`
       fragment FileFragment on File {
@@ -489,6 +504,7 @@ export const submission = {
  * A pre-fabricated GraphQL fragment and validator to specify arguments for an assignment.
  */
 export const assignment = {
+  params: false,
   body: () => ({
     q: gql`
       fragment RubricFragment on Rubric {
