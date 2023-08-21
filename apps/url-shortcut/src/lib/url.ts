@@ -35,12 +35,14 @@ export class ShortcutURL extends URL {
     for (const param in params) {
       this.searchParams.append(param, JSON.stringify(params[param]));
     }
+    return this;
   }
 
   mergeParams(params: Record<string, JsonValue>) {
     for (const param in params) {
       this.searchParams.set(param, JSON.stringify(params[param]));
     }
+    return this;
   }
 
   setParams(params: Record<string, JsonValue>) {
@@ -51,5 +53,6 @@ export class ShortcutURL extends URL {
     for (const param in params) {
       this.searchParams.set(param, JSON.stringify(params[param]));
     }
+    return this;
   }
 }
