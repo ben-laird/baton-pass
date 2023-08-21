@@ -1,11 +1,9 @@
 import { z } from "zod";
 
-import {
-  noVariableQuery as query,
-  queryGraphQL,
-  type QueryReturn,
-} from "@baton-pass/gql-canvas";
-import { thingsJsonSchema, ThingsJsonSchema } from "./lib";
+import * as G from "@baton-pass/gql-canvas";
+import { noVariableQuery as query } from "@baton-pass/gql-canvas";
+import * as S from "./lib";
+import { thingsJsonSchema as schema } from "./lib";
 
 const env = {
   ...z
@@ -20,21 +18,16 @@ const env = {
     .parse(process.env),
 } as const;
 
-type SafeSuccessInfer<T extends z.SafeParseReturnType<unknown, unknown>,> =
-  T extends z.SafeParseSuccess<infer I> ? I : never;
+// Conversion types
 
-type ConvertIn = SafeSuccessInfer<QueryReturn<typeof query>>;
+type ConvertIn = S.SuccessInfer<G.QueryReturn<typeof query>>;
 
-function assertNonEmpty<T>(array: Array<T>) {
-  if (array.length < 1) {
-    throw new Error("array must be nonempty!");
-  }
+type Schema = z.input<typeof schema>;
 
-  return array as [T, ...T[]];
-}
+// Where the magic happens
 
-function convert({ allCourses }: ConvertIn): ThingsJsonSchema {
-  const empty = (notes = "No reason given"): ThingsJsonSchema => ({
+function convert({ allCourses }: ConvertIn): Schema {
+  const empty = (notes = "No reason given"): Schema => ({
     data: [
       {
         type: "to-do",
@@ -44,12 +37,10 @@ function convert({ allCourses }: ConvertIn): ThingsJsonSchema {
     ],
   });
 
-  if (!allCourses) {
-    return empty();
-  }
+  if (!allCourses) return empty();
 
   return {
-    data: assertNonEmpty(
+    data: S.assertNonEmpty(
       allCourses.map(({ id, name }) => {
         const title =
           typeof name === "string"
@@ -72,7 +63,7 @@ function convert({ allCourses }: ConvertIn): ThingsJsonSchema {
  * @returns an integer representing the exit code of the program
  */
 export async function main(): Promise<number> {
-  const { fire } = queryGraphQL({
+  const { fire } = G.queryGraphQL({
     token: env.CANVAS_AUTH_TOKEN,
     endpoint: env.ENDPOINT,
     query,
@@ -85,15 +76,15 @@ export async function main(): Promise<number> {
     return 1;
   }
 
-  const courses = res.data.allCourses;
+  const { allCourses } = res.data;
 
-  if (!courses || courses.length === 0) {
+  if (!allCourses || allCourses.length === 0) {
     console.error("Response should contain a nonempty array of data!");
     console.error(res.data);
     return 1;
   }
 
-  const url = thingsJsonSchema.parse(convert({ allCourses: courses }));
+  const url = schema.parse(convert({ allCourses }));
 
   console.log(url.href);
 

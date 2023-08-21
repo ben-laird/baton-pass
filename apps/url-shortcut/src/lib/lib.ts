@@ -3,6 +3,18 @@ import { format, parseISO } from "date-fns";
 import { z } from "zod";
 import { ShortcutURL } from "./url";
 
+export type SuccessInfer<
+  T extends z.SafeParseReturnType<unknown, unknown>,
+> = T extends z.SafeParseSuccess<infer I> ? I : never;
+
+export function assertNonEmpty<T>(array: Array<T>) {
+  if (array.length < 1) {
+    throw new Error("array must be nonempty!");
+  }
+
+  return array as [T, ...T[]];
+}
+
 // === UTILITY SCHEMAS ===
 
 // Things date strings
