@@ -25,6 +25,14 @@ type SafeSuccessInfer<T extends z.SafeParseReturnType<unknown, unknown>,> =
 
 type ConvertIn = SafeSuccessInfer<QueryReturn<typeof query>>;
 
+function assertNonEmpty<T>(array: Array<T>) {
+  if (array.length < 1) {
+    throw new Error("array must be nonempty!");
+  }
+
+  return array as [T, ...T[]];
+}
+
 function convert({ allCourses }: ConvertIn): ThingsJsonSchema {
   const empty = (notes = "No reason given"): ThingsJsonSchema => ({
     data: [
@@ -35,14 +43,6 @@ function convert({ allCourses }: ConvertIn): ThingsJsonSchema {
       },
     ],
   });
-
-  function assertNonEmpty<T>(array: Array<T>) {
-    if (array.length < 1) {
-      throw new Error("array must be nonempty!");
-    }
-
-    return array as [T, ...T[]];
-  }
 
   if (!allCourses) {
     return empty();
