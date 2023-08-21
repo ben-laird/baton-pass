@@ -3,7 +3,9 @@ import { z } from "zod";
 import {
   noVariableQuery as query,
   queryGraphQL,
+  type QueryReturn,
 } from "@baton-pass/gql-canvas";
+import { thingsJsonSchema, ThingsJsonSchema } from "./lib";
 
 const env = {
   ...z
@@ -17,6 +19,52 @@ const env = {
     })
     .parse(process.env),
 } as const;
+
+type SafeSuccessInfer<T extends z.SafeParseReturnType<unknown, unknown>,> =
+  T extends z.SafeParseSuccess<infer I> ? I : never;
+
+type ConvertIn = SafeSuccessInfer<QueryReturn<typeof query>>;
+
+function convert({ allCourses }: ConvertIn): ThingsJsonSchema {
+  const empty = (notes = "No reason given"): ThingsJsonSchema => ({
+    data: [
+      {
+        type: "to-do",
+        operation: "create",
+        attributes: { title: "Empty To-Do", notes },
+      },
+    ],
+  });
+
+  function assertNonEmpty<T>(array: Array<T>) {
+    if (array.length < 1) {
+      throw new Error("array must be nonempty!");
+    }
+
+    return array as [T, ...T[]];
+  }
+
+  if (!allCourses) {
+    return empty();
+  }
+
+  return {
+    data: assertNonEmpty(
+      allCourses.map(({ id, name }) => {
+        const title =
+          typeof name === "string"
+            ? name
+            : `${name.subject} ${name.class}-${name.section}: ${name.title}`;
+
+        return {
+          type: "project",
+          operation: "create",
+          attributes: { title, notes: `id: ${id}` },
+        };
+      }),
+    ),
+  };
+}
 
 /**
  * The main script. When this package is `install`ed,
@@ -45,7 +93,9 @@ export async function main(): Promise<number> {
     return 1;
   }
 
-  console.log(res.data);
+  const url = thingsJsonSchema.parse(convert({ allCourses: courses }));
+
+  console.log(url.href);
 
   return 0;
 }

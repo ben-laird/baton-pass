@@ -1,6 +1,7 @@
-import { z } from "zod";
 import { parseDate } from "chrono-node";
 import { format, parseISO } from "date-fns";
+import { z } from "zod";
+import { ShortcutURL } from "./url";
 
 // === UTILITY SCHEMAS ===
 
@@ -175,10 +176,18 @@ const projectSchema = z.union([
   }),
 ]);
 
-export const thingsJsonSchema = z.object({
-  "auth-token": z.string().optional(),
-  reveal: z.boolean().optional(),
-  data: z.union([todoSchema, projectSchema]).array().nonempty(),
-});
+export const thingsJsonSchema = z
+  .object({
+    "auth-token": z.string().optional(),
+    reveal: z.boolean().optional(),
+    data: z.union([todoSchema, projectSchema]).array().nonempty(),
+  })
+  .transform((a) => {
+    const url = new ShortcutURL("things:///json");
+
+    url.addParams(a);
+
+    return url;
+  });
 
 export type ThingsJsonSchema = z.input<typeof thingsJsonSchema>;

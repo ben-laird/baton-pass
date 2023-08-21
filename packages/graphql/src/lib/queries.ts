@@ -2,7 +2,20 @@ import { gql } from "graphql-request";
 import { z } from "zod";
 
 import * as F from "./fragments";
-import { schemaToRequest, schemaToSafeRequest } from "./lib";
+import {
+  GraphQLRequest,
+  GraphQLRequestNoParams,
+  GraphQLRequestWithParams,
+  schemaToRequest,
+  schemaToSafeRequest,
+} from "./lib";
+
+export type QueryReturn<T extends GraphQLRequest> =
+  T extends GraphQLRequestNoParams<infer R>
+    ? R
+    : T extends GraphQLRequestWithParams<infer R, unknown>
+    ? R
+    : never;
 
 /**
  * A pre-fabricated query for creating a Model.
