@@ -3,16 +3,11 @@ import { format, parseISO } from "date-fns";
 import { z } from "zod";
 import { ShortcutURL } from "./url";
 
-export type SuccessInfer<
-  T extends z.SafeParseReturnType<unknown, unknown>,
-> = T extends z.SafeParseSuccess<infer I> ? I : never;
+export type SuccessInfer<T extends z.SafeParseReturnType<unknown, unknown>> =
+  T extends z.SafeParseSuccess<infer I> ? I : never;
 
 export function assertNonEmpty<T>(array: Array<T>) {
-  if (array.length < 1) {
-    throw new Error("array must be nonempty!");
-  }
-
-  return array as [T, ...T[]];
+  return z.custom<T>().array().nonempty().parse(array);
 }
 
 // === UTILITY SCHEMAS ===
@@ -194,12 +189,6 @@ export const thingsJsonSchema = z
     reveal: z.boolean().optional(),
     data: z.union([todoSchema, projectSchema]).array().nonempty(),
   })
-  .transform((a) => {
-    const url = new ShortcutURL("things:///json");
-
-    url.addParams(a);
-
-    return url;
-  });
+  .transform((a) => new ShortcutURL("things:///json").addParams(a));
 
 export type ThingsJsonSchema = z.input<typeof thingsJsonSchema>;
