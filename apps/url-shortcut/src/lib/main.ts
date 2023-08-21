@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import * as b from "@baton-pass/gql-canvas";
+import * as B from "@baton-pass/gql-canvas";
 import { noVariableQuery as query } from "@baton-pass/gql-canvas";
+
 import * as S from "./lib";
 import { thingsJsonSchema as schema } from "./lib";
 
@@ -20,11 +21,11 @@ const env = {
 
 // Conversion types
 
-type ConvertIn = S.SuccessInfer<b.QueryReturn<typeof query>>;
+type ConvertIn = S.SuccessInfer<B.QueryReturn<typeof query>>;
 
 type Schema = z.input<typeof schema>;
 
-// Where the magic happens
+// Conversion function - where the magic happens
 
 function convert({ allCourses }: ConvertIn): Schema {
   const empty = (notes = "No reason given"): Schema => ({
@@ -63,13 +64,13 @@ function convert({ allCourses }: ConvertIn): Schema {
  * @returns an integer representing the exit code of the program
  */
 export async function main(): Promise<number> {
-  const { fire } = b.queryGraphQL({
+  const { fire } = B.queryGraphQL({
     token: env.CANVAS_AUTH_TOKEN,
     endpoint: env.ENDPOINT,
     query,
   });
 
-  const res = await fire({ id: env.USER_ID });
+  const res = await fire();
 
   if (!res.success) {
     console.error(res.error.issues);

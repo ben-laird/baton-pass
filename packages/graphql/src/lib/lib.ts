@@ -92,12 +92,28 @@ export function schemaToSafeRequest(
 
 // Query executor
 
-export interface QueryGQL<P extends Variables, R> {
+interface QueryGQLWithParams<P extends Variables, R> {
   endpoint: string;
   token?: string;
-  query: GraphQLRequest<R, P>;
+  query: GraphQLRequestWithParams<R, P>;
 }
 
+interface QueryGQLNoParams<R> {
+  endpoint: string;
+  token?: string;
+  query: GraphQLRequestNoParams<R>;
+}
+
+export type QueryGQL<P extends Variables, R> =
+  | QueryGQLWithParams<P, R>
+  | QueryGQLNoParams<R>;
+
+export function queryGraphQL<P extends Variables, R>(
+  params: QueryGQLWithParams<P, R>,
+): { fire: (queryParams: P) => Promise<R> };
+export function queryGraphQL<R>(
+  params: QueryGQLNoParams<R>,
+): { fire: () => Promise<R> };
 export function queryGraphQL<P extends Variables, R>(params: QueryGQL<P, R>) {
   const client = new GraphQLClient(params.endpoint).setHeader(
     "authorization",
@@ -113,7 +129,7 @@ export function queryGraphQL<P extends Variables, R>(params: QueryGQL<P, R>) {
 
         return req.parser(await client.request(reqBody.q));
       },
-    } as { fire: () => Promise<R> };
+    };
   }
 
   return {
@@ -122,5 +138,5 @@ export function queryGraphQL<P extends Variables, R>(params: QueryGQL<P, R>) {
 
       return req.parser(await client.request<unknown, Variables>(q, variables));
     },
-  } as { fire: (queryParams: P) => Promise<R> };
+  };
 }
