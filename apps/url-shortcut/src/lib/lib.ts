@@ -32,7 +32,7 @@ const timeString = z
 
 // Things datetime strings
 
-export const dateTimeString = z
+const dateTimeString = z
   .union([z.string().datetime(), z.string().includes("@"), z.date()])
   .transform((a, ctx) => {
     if (typeof a === "string") {
@@ -54,20 +54,38 @@ export const dateTimeString = z
     return format(a, "MMMM do, y@h aaa");
   });
 
+const ISOString = z
+  .union([z.string().datetime(), z.date()])
+  .transform((a) => {
+    if (typeof a === "string") {
+      return a;
+    }
+
+    return a.toISOString();
+  })
+  .pipe(z.string().datetime());
+
 // Other utilities
 
-const when = z
-  .union([
-    z.enum(["today", "tomorrow", "evening", "anytime", "someday"]),
-    dateString,
-  ])
-  .optional();
+const whenSchema = z.union([
+  z.enum(["today", "tomorrow", "evening", "anytime", "someday"]),
+  dateString,
+  dateTimeString,
+]);
+
+const encodedSchema = (separator: string, max?: number) => {
+  const base = max
+    ? z.string().array().nonempty().max(max)
+    : z.string().array().nonempty();
+
+  return base.transform((a) => {
+    return a.join(separator);
+  });
+};
 
 // === FINAL SCHEMA ===
 
-// These two are exported temporarily
-
-export const headingSchema = z.object({
+const headingSchema = z.object({
   type: z.literal("heading"),
   attributes: z.object({
     title: z.string().optional(),
@@ -75,7 +93,7 @@ export const headingSchema = z.object({
   }),
 });
 
-export const checklistItemSchema = z.object({
+const checklistItemSchema = z.object({
   type: z.literal("checklist-item"),
   attributes: z.object({
     title: z.string().optional(),
@@ -89,21 +107,21 @@ export const checklistItemSchema = z.object({
 const todoAttributes = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),
-  when,
+  when: whenSchema.optional(),
   deadline: dateString.optional(),
   tags: z.string().array().nonempty().optional(),
-  "checklist-items": z.string().array().nonempty().max(100).optional(),
-  "list-id": z.string().optional(),
+  "checklist-items": checklistItemSchema.array().nonempty().max(100).optional(),
+  "list-id": z.string().uuid().optional(),
   list: z.string().optional(),
-  "heading-id": z.string().optional(),
+  "heading-id": z.string().uuid().optional(),
   heading: z.string().optional(),
   completed: z.boolean().optional(),
   canceled: z.boolean().optional(),
-  "creation-date": dateString.optional(),
-  "completion-date": dateString.optional(),
+  "creation-date": ISOString.optional(),
+  "completion-date": ISOString.optional(),
 });
 
-export const todoSchema = z.union([
+const todoSchema = z.union([
   z.object({
     type: z.literal("to-do"),
     operation: z.literal("create"),
@@ -115,30 +133,9 @@ export const todoSchema = z.union([
     attributes: todoAttributes.extend({
       "prepend-notes": z.string().optional(),
       "append-notes": z.string().optional(),
-      "add-tags": z
-        .string()
-        .array()
-        .nonempty()
-        .transform((a) => {
-          return a.join(",");
-        })
-        .optional(),
-      "prepend-checklist-items": z
-        .string()
-        .array()
-        .nonempty()
-        .transform((a) => {
-          return a.join("\n");
-        })
-        .optional(),
-      "append-checklist-items": z
-        .string()
-        .array()
-        .nonempty()
-        .transform((a) => {
-          return a.join("\n");
-        })
-        .optional(),
+      "add-tags": encodedSchema(",").optional(),
+      "prepend-checklist-items": encodedSchema("\n", 100).optional(),
+      "append-checklist-items": encodedSchema("\n", 100).optional(),
     }),
   }),
 ]);
@@ -148,23 +145,23 @@ export const todoSchema = z.union([
 const projectAttributes = z.object({
   title: z.string().optional(),
   notes: z.string().optional(),
-  when,
+  when: whenSchema.optional(),
   deadline: dateString.optional(),
-  tags: z.string().array().optional(),
+  tags: z.string().array().nonempty().optional(),
   completed: z.boolean().optional(),
   canceled: z.boolean().optional(),
-  "creation-date": dateString.optional(),
-  "completion-date": dateString.optional(),
+  "creation-date": ISOString.optional(),
+  "completion-date": ISOString.optional(),
   "area-id": z.string().uuid().optional(),
   area: z.string().optional(),
 });
 
-export const projectSchema = z.union([
+const projectSchema = z.union([
   z.object({
     type: z.literal("project"),
     operation: z.literal("create"),
     attributes: projectAttributes.extend({
-      items: todoSchema.array().nonempty().optional(),
+      items: z.union([todoSchema, headingSchema]).array().nonempty().optional(),
     }),
   }),
   z.object({
@@ -173,14 +170,7 @@ export const projectSchema = z.union([
     attributes: projectAttributes.extend({
       "prepend-notes": z.string().optional(),
       "append-notes": z.string().optional(),
-      "add-tags": z
-        .string()
-        .array()
-        .nonempty()
-        .transform((a) => {
-          return a.join(",");
-        })
-        .optional(),
+      "add-tags": encodedSchema(",").optional(),
     }),
   }),
 ]);
@@ -190,3 +180,5 @@ export const thingsJsonSchema = z.object({
   reveal: z.boolean().optional(),
   data: z.union([todoSchema, projectSchema]).array().nonempty(),
 });
+
+export type ThingsJsonSchema = z.input<typeof thingsJsonSchema>;
