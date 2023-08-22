@@ -2,54 +2,151 @@ import { gql } from "graphql-request";
 import { z } from "zod";
 
 import * as F from "./fragments";
-import {
-  GraphQLRequest,
-  GraphQLRequestNoParams,
-  GraphQLRequestWithParams,
-  schemaToRequest,
-  schemaToSafeRequest,
-} from "./lib";
+import * as G from "./lib";
 
-export type QueryReturn<T extends GraphQLRequest> =
-  T extends GraphQLRequestNoParams<infer R>
+export type QueryReturn<T extends G.AnyGraphQLRequest> =
+  // rome-ignore lint/suspicious/noExplicitAny: used in generic
+  T extends G.GraphQLRequestWithParams<infer R, any>
     ? R
-    : T extends GraphQLRequestWithParams<infer R, unknown>
+    : T extends G.GraphQLRequestNoParams<infer R>
     ? R
     : never;
 
 /**
  * A pre-fabricated query for creating a Model.
  */
-export const bigModelQuery = schemaToRequest({
+export const bigModelQuery = G.schemaToSafeRequest({
   params: true,
   body: (variables: { id: number }) => {
-    const courseBody = F.course.body();
-    const moduleBody = F.module.body();
-    const moduleItemBody = F.moduleItem.body();
-    const subHeaderBody = F.subHeader.body();
-    const pageBody = F.page.body();
-    const assignmentBody = F.assignment.body();
-    const fileBody = F.file.body();
-    const extUrlBody = F.extUrl.body();
-    const moduleExtToolBody = F.moduleExtTool.body();
-    const extToolBody = F.extTool.body();
-    const discussionBody = F.discussion.body();
-    const quizBody = F.quiz.body();
-
     return {
       q: gql`
-        ${courseBody.q}
-        ${moduleBody.q}
-        ${moduleItemBody.q}
-        ${subHeaderBody.q}
-        ${pageBody.q}
-        ${assignmentBody.q}
-        ${fileBody.q}
-        ${extUrlBody.q}
-        ${moduleExtToolBody.q}
-        ${extToolBody.q}
-        ${discussionBody.q}
-        ${quizBody.q}
+        fragment RubricFragment on Rubric {
+          id: _id
+          title
+          pointsPossible
+          criteria {
+            id: _id
+            description
+            longDescription
+            points
+          }
+        }
+        fragment SubmissionFragment on Submission {
+          id: _id
+          gradingStatus
+          submittedAt
+          grade
+          score
+          enteredGrade
+          enteredScore
+          late
+          missing
+          isCurrent: gradeMatchesCurrentSubmission
+          latePolicyStatus
+          attachment {
+            ...FileFragment
+          }
+        }
+        fragment CourseFragment on Course {
+          id: _id
+          name
+          courseCode
+        }
+        fragment ModuleFragment on Module {
+          id: _id
+          name
+          position
+        }
+        fragment ModuleItemFragment on ModuleItem {
+          id: _id
+          url
+        }
+        fragment SubHeaderFragment on SubHeader {
+          type: __typename
+          title
+        }
+        fragment PageFragment on Page {
+          type: __typename
+          id: _id
+          title
+          createdAt
+          updatedAt
+        }
+        fragment AssignmentFragment on Assignment {
+          type: __typename
+          id: _id
+          name
+          description
+          url: htmlUrl
+          pointsPossible
+          rubric {
+            ...RubricFragment
+          }
+          createdAt
+          dueAt
+          lockAt
+          updatedAt
+          state
+          allowedAttempts
+          submissions: submissionsConnection {
+            grades: nodes {
+              ...SubmissionFragment
+            }
+          }
+        }
+        fragment FileFragment on File {
+          type: __typename
+          id: _id
+          contentType
+          url
+        }
+        fragment ExtUrlFragment on ExternalUrl {
+          type: __typename
+          id: _id
+          title
+          extUrl: url
+        }
+        fragment ModuleExtToolFragment on ModuleExternalTool {
+          type: __typename
+          id: _id
+          modUrl: url
+        }
+        fragment ExtToolFragment on ExternalTool {
+          type: __typename
+          id: _id
+          name
+          description
+          url
+        }
+        fragment DiscussionFragment on Discussion {
+          type: __typename
+          id: _id
+          title
+          entries: discussionEntriesConnection {
+            posts: nodes {
+              id: _id
+              author {
+                id: _id
+                name
+                shortName
+                pronouns
+              }
+              message
+              attachment {
+                ...FileFragment
+              }
+              subentriesCount
+              createdAt
+              updatedAt
+            }
+          }
+        }
+        fragment QuizFragment on Quiz {
+          type: __typename
+          id: _id
+          createdAt
+          updatedAt
+        }
 
         query ModelQuery($id: ID!) {
           Model: legacyNode(_id: $id, type: User) {
@@ -101,7 +198,7 @@ export const bigModelQuery = schemaToRequest({
                         items: F.module.schema
                           .extend({
                             content: z
-                              .union([
+                              .discriminatedUnion("type", [
                                 F.subHeader.schema,
                                 F.page.schema,
                                 F.assignment.schema,
@@ -112,18 +209,18 @@ export const bigModelQuery = schemaToRequest({
                                 F.discussion.schema,
                                 F.quiz.schema,
                               ])
-                              .nullable(),
+                              .nullish(),
                           })
                           .array()
-                          .nullable(),
+                          .nullish(),
                       })
-                      .nullable()
+                      .nullish()
                       .array()
-                      .nullable(),
+                      .nullish(),
                   })
-                  .nullable(),
+                  .nullish(),
               })
-              .nullable(),
+              .nullish(),
           })
           .array(),
       }),
@@ -131,7 +228,7 @@ export const bigModelQuery = schemaToRequest({
     .transform(({ Model }) => Model.enrollments),
 });
 
-export const smallModelQuery = schemaToRequest({
+export const smallModelQuery = G.schemaToRequest({
   params: true,
   body: (variables: { id: number }) => ({
     q: gql`
@@ -166,11 +263,11 @@ export const smallModelQuery = schemaToRequest({
             course: z.object({
               id: z.coerce.number(),
               name: z.string(),
-              courseCode: z.string().nullable(),
-              courseNickname: z.string().nullable(),
+              courseCode: z.string().nullish(),
+              courseNickname: z.string().nullish(),
               term: z.object({
                 id: z.coerce.number(),
-                name: z.string().nullable(),
+                name: z.string().nullish(),
               }),
             }),
           })
@@ -180,7 +277,7 @@ export const smallModelQuery = schemaToRequest({
     .transform(({ Model }) => Model.enrollments),
 });
 
-export const quickAndDirtyQuery = schemaToSafeRequest({
+export const quickAndDirtyQuery = G.schemaToSafeRequest({
   params: true,
   body: (variables: { id: number }) => {
     const courseBody = F.course.body();
@@ -219,7 +316,7 @@ export const quickAndDirtyQuery = schemaToSafeRequest({
     .transform(({ Model }) => Model.enrollments),
 });
 
-export const noVariableQuery = schemaToSafeRequest({
+export const noVariableQuery = G.schemaToSafeRequest({
   params: false,
   body: () => ({
     q: gql`
@@ -233,6 +330,6 @@ export const noVariableQuery = schemaToSafeRequest({
     `,
   }),
   schema: z.object({
-    allCourses: F.course.schema.array().nullable(),
+    allCourses: F.course.schema.array().nullish(),
   }),
 });

@@ -24,14 +24,14 @@ export const grades = {
     `,
   }),
   schema: z.object({
-    currentGrade: z.string().nullable(),
-    currentScore: z.coerce.number().nullable(),
-    finalGrade: z.string().nullable(),
-    finalScore: z.coerce.number().nullable(),
-    unpostedCurrentGrade: z.string().nullable(),
-    unpostedCurrentScore: z.coerce.number().nullable(),
-    unpostedFinalGrade: z.string().nullable(),
-    unpostedFinalScore: z.coerce.number().nullable(),
+    currentGrade: z.string().nullish(),
+    currentScore: z.coerce.number().nullish(),
+    finalGrade: z.string().nullish(),
+    finalScore: z.coerce.number().nullish(),
+    unpostedCurrentGrade: z.string().nullish(),
+    unpostedCurrentScore: z.coerce.number().nullish(),
+    unpostedFinalGrade: z.string().nullish(),
+    unpostedFinalScore: z.coerce.number().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -42,16 +42,8 @@ export const enrollment = {
   params: false,
   body: () => ({
     q: gql`
-      fragment GradesFragment on Grades {
-        currentGrade
-        currentScore
-        finalGrade
-        finalScore
-        unpostedCurrentGrade
-        unpostedCurrentScore
-        unpostedFinalGrade
-        unpostedFinalScore
-      }
+      ${grades.body().q}
+
       fragment EnrollmentFragment on Enrollment {
         id: _id
         state
@@ -65,19 +57,8 @@ export const enrollment = {
   schema: z.object({
     id: z.coerce.number(),
     state: z.string(),
-    htmlUrl: z.string().url().nullable(),
-    grades: z
-      .object({
-        currentGrade: z.string().nullable(),
-        currentScore: z.coerce.number().nullable(),
-        finalGrade: z.string().nullable(),
-        finalScore: z.coerce.number().nullable(),
-        unpostedCurrentGrade: z.string().nullable(),
-        unpostedCurrentScore: z.coerce.number().nullable(),
-        unpostedFinalGrade: z.string().nullable(),
-        unpostedFinalScore: z.coerce.number().nullable(),
-      })
-      .nullable(),
+    htmlUrl: z.string().url().nullish(),
+    grades: grades.schema,
   }),
 } satisfies GraphQLSchema;
 
@@ -111,7 +92,7 @@ export const course = {
     }),
     courseCode: z
       .string()
-      .nullable()
+      .nullish()
       .transform((a) => {
         const matches = a?.match(/(\w{4})(\d{3})_(\d{3})_(\d{4})(\d{2})/);
 
@@ -148,8 +129,8 @@ export const module = {
   }),
   schema: z.object({
     id: z.coerce.number(),
-    name: z.string().nullable(),
-    position: z.coerce.number().nullable(),
+    name: z.string().nullish(),
+    position: z.number().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -168,7 +149,7 @@ export const moduleItem = {
   }),
   schema: z.object({
     id: z.coerce.number(),
-    url: z.string().url().nullable(),
+    url: z.string().url().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -187,7 +168,7 @@ export const subHeader = {
   }),
   schema: z.object({
     type: z.literal("SubHeader"),
-    title: z.string().nullable(),
+    title: z.string().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -210,9 +191,9 @@ export const page = {
   schema: z.object({
     type: z.literal("Page"),
     id: z.coerce.number(),
-    title: z.string().nullable(),
-    createdAt: z.coerce.date().nullable(),
-    updatedAt: z.coerce.date().nullable(),
+    title: z.string().nullish(),
+    createdAt: z.coerce.date().nullish(),
+    updatedAt: z.coerce.date().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -234,8 +215,8 @@ export const file = {
   schema: z.object({
     type: z.literal("File"),
     id: z.coerce.number(),
-    contentType: z.string().nullable(),
-    url: z.string().url().nullable(),
+    contentType: z.string().nullish(),
+    url: z.string().url().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -258,9 +239,9 @@ export const extTool = {
   schema: z.object({
     type: z.literal("ExternalTool"),
     id: z.coerce.number(),
-    name: z.string().nullable(),
-    description: z.string().nullable(),
-    url: z.string().url().nullable(),
+    name: z.string().nullish(),
+    description: z.string().nullish(),
+    url: z.string().url().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -271,12 +252,8 @@ export const discussion = {
   params: false,
   body: () => ({
     q: gql`
-      fragment FileFragment on File {
-        type: __typename
-        id: _id
-        contentType
-        url
-      }
+      ${file.body().q}
+
       fragment DiscussionFragment on Discussion {
         type: __typename
         id: _id
@@ -305,7 +282,7 @@ export const discussion = {
   schema: z.object({
     type: z.literal("Discussion"),
     id: z.coerce.number(),
-    title: z.string().nullable(),
+    title: z.string().nullish(),
     entries: z
       .object({
         posts: z
@@ -314,29 +291,22 @@ export const discussion = {
             author: z
               .object({
                 id: z.coerce.number(),
-                name: z.string().nullable(),
-                shortname: z.string().nullable(),
-                pronouns: z.string().nullable(),
+                name: z.string().nullish(),
+                shortname: z.string().nullish(),
+                pronouns: z.string().nullish(),
               })
-              .nullable(),
-            message: z.string().nullable(),
-            attachment: z
-              .object({
-                type: z.literal("File"),
-                id: z.coerce.number(),
-                contentType: z.string().nullable(),
-                url: z.string().url().nullable(),
-              })
-              .nullable(),
-            subentriesCount: z.coerce.number().nullable(),
-            createdAt: z.coerce.date().nullable(),
-            updatedAt: z.coerce.date().nullable(),
+              .nullish(),
+            message: z.string().nullish(),
+            attachment: file.schema.nullish(),
+            subentriesCount: z.coerce.number().nullish(),
+            createdAt: z.coerce.date().nullish(),
+            updatedAt: z.coerce.date().nullish(),
           })
-          .nullable()
+          .nullish()
           .array()
-          .nullable(),
+          .nullish(),
       })
-      .nullable(),
+      .nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -358,8 +328,8 @@ export const quiz = {
   schema: z.object({
     type: z.literal("Quiz"),
     id: z.coerce.number(),
-    createdAt: z.coerce.date().nullable(),
-    updatedAt: z.coerce.date().nullable(),
+    createdAt: z.coerce.date().nullish(),
+    updatedAt: z.coerce.date().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -381,8 +351,8 @@ export const extUrl = {
   schema: z.object({
     type: z.literal("ExternalUrl"),
     id: z.coerce.number(),
-    title: z.string().nullable(),
-    extUrl: z.string().url().nullable(),
+    title: z.string().nullish(),
+    extUrl: z.string().url().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -403,7 +373,7 @@ export const moduleExtTool = {
   schema: z.object({
     type: z.literal("ModuleExternalTool"),
     id: z.coerce.number(),
-    modUrl: z.string().url().nullable(),
+    modUrl: z.string().url().nullish(),
   }),
 } satisfies GraphQLSchema;
 
@@ -429,14 +399,14 @@ export const rubric = {
   }),
   schema: z.object({
     id: z.coerce.number(),
-    title: z.string().nullable(),
-    pointsPossible: z.coerce.number().nullable(),
+    title: z.string().nullish(),
+    pointsPossible: z.coerce.number().nullish(),
     criteria: z
       .object({
-        id: z.coerce.number(),
-        description: z.string().nullable(),
-        longDescription: z.string().nullable(),
-        points: z.coerce.number().nullable(),
+        id: z.union([z.string(), z.number()]),
+        description: z.string().nullish(),
+        longDescription: z.string().nullish(),
+        points: z.coerce.number().nullish(),
       })
       .array(),
   }),
@@ -449,12 +419,8 @@ export const submission = {
   params: false,
   body: () => ({
     q: gql`
-      fragment FileFragment on File {
-        type: __typename
-        id: _id
-        contentType
-        url
-      }
+      ${file.body().q}
+
       fragment SubmissionFragment on Submission {
         id: _id
         gradingStatus
@@ -477,26 +443,17 @@ export const submission = {
     id: z.coerce.number(),
     gradingStatus: z
       .enum(["needs_grading", "excused", "needs_review", "graded"])
-      .nullable(),
-    submittedAt: z.coerce.date().nullable(),
-    grade: z.string().nullable(),
-    score: z.coerce.number().nullable(),
-    enteredGrade: z.string().nullable(),
-    enteredScore: z.coerce.number().nullable(),
-    late: z.boolean().nullable(),
-    missing: z.boolean().nullable(),
-    isCurrent: z.boolean().nullable(),
-    latePolicyStatus: z
-      .enum(["late", "missing", "extended", "none"])
-      .nullable(),
-    attachment: z
-      .object({
-        type: z.literal("File"),
-        id: z.coerce.number(),
-        contentType: z.string().nullable(),
-        url: z.string().url().nullable(),
-      })
-      .nullable(),
+      .nullish(),
+    submittedAt: z.coerce.date().nullish(),
+    grade: z.string().nullish(),
+    score: z.coerce.number().nullish(),
+    enteredGrade: z.string().nullish(),
+    enteredScore: z.coerce.number().nullish(),
+    late: z.boolean().nullish(),
+    missing: z.boolean().nullish(),
+    isCurrent: z.boolean().nullish(),
+    latePolicyStatus: z.enum(["late", "missing", "extended", "none"]).nullish(),
+    attachment: file.schema,
   }),
 } satisfies GraphQLSchema;
 
@@ -507,39 +464,10 @@ export const assignment = {
   params: false,
   body: () => ({
     q: gql`
-      fragment RubricFragment on Rubric {
-        id: _id
-        title
-        pointsPossible
-        criteria {
-          id: _id
-          description
-          longDescription
-          points
-        }
-      }
-      fragment FileFragment on File {
-        type: __typename
-        id: _id
-        contentType
-        url
-      }
-      fragment SubmissionFragment on Submission {
-        id: _id
-        gradingStatus
-        submittedAt
-        grade
-        score
-        enteredGrade
-        enteredScore
-        late
-        missing
-        isCurrent: gradeMatchesCurrentSubmission
-        latePolicyStatus
-        attachment {
-          ...FileFragment
-        }
-      }
+      ${rubric.body().q}
+      ${file.body().q}
+      ${submission.body().q}
+
       fragment AssignmentFragment on Assignment {
         type: __typename
         id: _id
@@ -567,29 +495,15 @@ export const assignment = {
   schema: z.object({
     type: z.literal("Assignment"),
     id: z.coerce.number(),
-    name: z.string().nullable(),
-    description: z.string().nullable(),
-    url: z.string().url().nullable(),
-    pointsPossible: z.coerce.number().nullable(),
-    rubric: z
-      .object({
-        id: z.coerce.number(),
-        title: z.string().nullable(),
-        pointsPossible: z.coerce.number().nullable(),
-        criteria: z
-          .object({
-            id: z.coerce.number(),
-            description: z.string().nullable(),
-            longDescription: z.string().nullable(),
-            points: z.coerce.number().nullable(),
-          })
-          .array(),
-      })
-      .nullable(),
-    createdAt: z.coerce.date().nullable(),
-    dueAt: z.coerce.date().nullable(),
-    lockAt: z.coerce.date().nullable(),
-    updatedAt: z.coerce.date().nullable(),
+    name: z.string().nullish(),
+    description: z.string().nullish(),
+    url: z.string().url().nullish(),
+    pointsPossible: z.coerce.number().nullish(),
+    rubric: rubric.schema.nullish(),
+    createdAt: z.coerce.date().nullish(),
+    dueAt: z.coerce.date().nullish(),
+    lockAt: z.coerce.date().nullish(),
+    updatedAt: z.coerce.date().nullish(),
     state: z.enum([
       "unpublished",
       "published",
@@ -601,39 +515,7 @@ export const assignment = {
       "migrating",
       "failed_to_migrate",
     ]),
-    allowedAttempts: z.coerce.number().nullable(),
-    submissions: z
-      .object({
-        grades: z
-          .object({
-            id: z.coerce.number(),
-            gradingStatus: z
-              .enum(["needs_grading", "excused", "needs_review", "graded"])
-              .nullable(),
-            submittedAt: z.coerce.date().nullable(),
-            grade: z.string().nullable(),
-            score: z.coerce.number().nullable(),
-            enteredGrade: z.string().nullable(),
-            enteredScore: z.coerce.number().nullable(),
-            late: z.boolean().nullable(),
-            missing: z.boolean().nullable(),
-            isCurrent: z.boolean().nullable(),
-            latePolicyStatus: z
-              .enum(["late", "missing", "extended", "none"])
-              .nullable(),
-            attachment: z
-              .object({
-                type: z.literal("File"),
-                id: z.coerce.number(),
-                contentType: z.string().nullable(),
-                url: z.string().url().nullable(),
-              })
-              .nullable(),
-          })
-          .nullable()
-          .array()
-          .nullable(),
-      })
-      .nullable(),
+    allowedAttempts: z.coerce.number().nullish(),
+    submissions: z.object({ grades: grades.schema }).array().catch([]),
   }),
 } satisfies GraphQLSchema;
