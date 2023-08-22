@@ -19,6 +19,9 @@ export type GraphQLRequest<T = unknown, V = unknown> =
   | GraphQLRequestNoParams<T>
   | GraphQLRequestWithParams<T, V>;
 
+// rome-ignore lint/suspicious/noExplicitAny: should only be used in generics
+export  type AnyGraphQLRequest = GraphQLRequest<any, any>;
+
 export interface GraphQLSchemaNoParams {
   params: false;
   body: () => { q: string };
