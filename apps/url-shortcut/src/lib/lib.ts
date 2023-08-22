@@ -6,8 +6,14 @@ import { ShortcutURL } from "./url";
 export type SuccessInfer<T extends z.SafeParseReturnType<unknown, unknown>> =
   T extends z.SafeParseSuccess<infer I> ? I : never;
 
-export function assertNonEmpty<T>(array: Array<T>) {
-  return z.custom<T>().array().nonempty().parse(array);
+export type UnaryVariadic<T> = [T, ...T[]];
+
+export function assertNonEmpty<T>(params: {
+  arr: Array<T>;
+  message?: string;
+}): UnaryVariadic<T> {
+  const { arr, message } = params;
+  return z.custom<T>().array().nonempty(message).parse(arr);
 }
 
 // === UTILITY SCHEMAS ===
