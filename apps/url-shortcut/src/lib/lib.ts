@@ -9,11 +9,23 @@ export type SuccessInfer<T extends z.SafeParseReturnType<unknown, unknown>> =
 export type UnaryVariadic<T> = [T, ...T[]];
 
 export function assertNonEmpty<T>(params: {
-  arr: Array<T>;
+  array: Array<T>;
   message?: string;
 }): UnaryVariadic<T> {
-  const { arr, message } = params;
-  return z.custom<T>().array().nonempty(message).parse(arr);
+  const { array, message } = params;
+  return z.custom<T>().array().nonempty(message).parse(array);
+}
+
+export function guarantee<T>(params: {
+  value: T | null | undefined;
+  message?: string;
+}) {
+  const { value, message } = params;
+  if (!value) {
+    throw new Error(message ?? "Value should not be null or undefined!");
+  }
+
+  return value;
 }
 
 // === UTILITY SCHEMAS ===
@@ -81,11 +93,18 @@ const ISOString = z
 
 // Other utilities
 
-const whenSchema = z.union([
-  z.enum(["today", "tomorrow", "evening", "anytime", "someday"]),
-  dateString,
-  dateTimeString,
-]);
+const whenSchema = z
+  .discriminatedUnion("style", [
+    z.object({
+      style: z.literal("special"),
+      data: z.enum(["today", "tomorrow", "evening", "anytime", "someday"]),
+    }),
+    z.object({
+      style: z.literal("standard"),
+      data: z.union([dateString, dateTimeString]),
+    }),
+  ])
+  .transform((a) => a.data);
 
 const encodedSchema = (separator: string, max?: number) => {
   const base = max

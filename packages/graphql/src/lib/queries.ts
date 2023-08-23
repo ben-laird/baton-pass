@@ -20,6 +20,11 @@ export const bigModelQuery = G.schemaToSafeRequest({
   body: (variables: { id: number }) => {
     return {
       q: gql`
+        fragment EnrollmentFragment on Enrollment {
+          id: _id
+          state
+          htmlUrl
+        }
         fragment RubricFragment on Rubric {
           id: _id
           title
@@ -152,7 +157,7 @@ export const bigModelQuery = G.schemaToSafeRequest({
           Model: legacyNode(_id: $id, type: User) {
             ... on User {
               enrollments {
-                id: _id
+                ...EnrollmentFragment
                 course {
                   ...CourseFragment
                   modulesConnection {
@@ -186,9 +191,8 @@ export const bigModelQuery = G.schemaToSafeRequest({
   schema: z
     .object({
       Model: z.object({
-        enrollments: z
-          .object({
-            id: z.coerce.number(),
+        enrollments: F.enrollment.schema
+          .extend({
             course: F.course.schema
               .extend({
                 modulesConnection: z

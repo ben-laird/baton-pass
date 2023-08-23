@@ -42,23 +42,25 @@ export const enrollment = {
   params: false,
   body: () => ({
     q: gql`
-      ${grades.body().q}
-
       fragment EnrollmentFragment on Enrollment {
         id: _id
         state
         htmlUrl
-        grades {
-          ...GradesFragment
-        }
       }
     `,
   }),
   schema: z.object({
     id: z.coerce.number(),
-    state: z.string(),
+    state: z.enum([
+      "invited",
+      "creation_pending",
+      "active",
+      "deleted",
+      "rejected",
+      "completed",
+      "inactive",
+    ]),
     htmlUrl: z.string().url().nullish(),
-    grades: grades.schema,
   }),
 } satisfies GraphQLSchema;
 
@@ -73,6 +75,7 @@ export const course = {
         id: _id
         name
         courseCode
+        syllabusBody
       }
     `,
   }),
@@ -110,6 +113,7 @@ export const course = {
             }
           : a;
       }),
+    syllabusBody: z.string().nullish(),
   }),
 } satisfies GraphQLSchema;
 
