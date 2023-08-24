@@ -124,174 +124,184 @@ export function convert(a: ConvertIn): Schema {
                         message: "Module item should have content!",
                       });
 
-                      // Switching based upon module item content type to customize to-do
-
-                      function expr<T>(lam: () => T): T {
-                        return lam();
+                      interface ModuleItemAttributes {
+                        title: string;
+                        notes?: string;
+                        deadline?: Date;
+                        completed?: boolean;
                       }
 
-                      switch (content.type) {
-                        case "Assignment": {
-                          const {
-                            description,
-                            name,
-                            pointsPossible,
-                            createdAt,
-                            dueAt,
-                            updatedAt,
-                            rubric: nullishRubric,
-                            url,
-                          } = content;
+                      const attributes = moduleItemConvert();
 
-                          const rubric = expr(() => {
-                            if (!nullishRubric) {
-                              return "No rubric provided";
-                            }
+                      return { type: "to-do", operation: "create", attributes };
 
-                            const { title, pointsPossible, criteria } =
-                              nullishRubric;
+                      type Nullish<T> = T | null | undefined;
 
-                            const formattedCriteria = criteria
-                              .map(({ longDescription, points }) => {
-                                return `${
-                                  points ?? "Unknown number of"
-                                } point(s) - ${
-                                  longDescription ?? "No description provided"
-                                }`;
-                              })
-                              .join("\n");
+                      function naturalFormatDate(date: Nullish<Date>) {
+                        if (!date) return "Unknown";
 
-                            return `${title ?? "Unknown title"}\n\
-                            \n\
-                            - Points possible: ${pointsPossible ?? "unknown"}\n\
-                            \n\
-                            ${formattedCriteria}`;
-                          });
+                        return format(date, "MMMM do, y at h aaa");
+                      }
 
-                          const title = modItemName ?? name ?? "No name";
+                      function moduleItemConvert(): ModuleItemAttributes {
+                        // Switching based upon module item content type to customize to-do
 
-                          const notes = `## Info\n\
-                          \n\
-                          ${description}\n\
-                          \n\
-                          - Type: Assignment\n\
-                          - Points possible: ${pointsPossible ?? "unknown"}\n\
-                          - Url: ${url ?? "none"}\n\
-                          - Created at: ${createdAt}\n\
-                          - Last updated ${format(
-                            updatedAt ?? new Date(),
-                            "MMMM do, y at h aaa",
-                          )}\n\
-                          \n\
-                          ## Rubric\n\
-                          \n\
-                          ${rubric}`;
+                        function expr<T>(lam: () => T): T {
+                          return lam();
+                        }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: {
-                              title,
-                              notes,
+                        switch (content.type) {
+                          case "Assignment": {
+                            const {
+                              description,
+                              name,
+                              pointsPossible,
+                              createdAt,
+                              dueAt,
+                              updatedAt,
+                              rubric: nullishRubric,
+                              url,
+                              submissions,
+                            } = content;
+
+                            const rubric = expr(() => {
+                              if (!nullishRubric) {
+                                return "No rubric provided";
+                              }
+
+                              const { title, pointsPossible, criteria } =
+                                nullishRubric;
+
+                              const formattedCriteria = criteria
+                                .map(({ longDescription, points }) => {
+                                  return `${
+                                    points ?? "Unknown number of"
+                                  } point(s) - ${
+                                    longDescription ?? "No description provided"
+                                  }`;
+                                })
+                                .join("\n");
+
+                              return `${title ?? "Unknown title"}\n\
+                              \n\
+                              - Points possible: ${pointsPossible ?? "unknown"}\n\
+                              \n\
+                              ${formattedCriteria}`;
+                            });
+
+                            return {
+                              title: modItemName ?? name ?? "No name",
+                              notes: `## Info\n\
+                              \n\
+                              ${description ?? "No description provided"}\n\
+                              \n\
+                              - Type: Assignment\n\
+                              - Points possible: ${pointsPossible ?? "unknown"}\n\
+                              - Url: ${url ?? "none"}\n\
+                              - Created at: ${naturalFormatDate(createdAt)}\n\
+                              - Last updated ${naturalFormatDate(updatedAt)}\n\
+                              \n\
+                              ## Rubric\n\
+                              \n\
+                              ${rubric}`,
                               deadline: dueAt ?? undefined,
-                            },
-                          };
-                        }
+                              completed: submissions.length > 0,
+                            };
+                          }
 
-                        case "Discussion": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.title ?? "No title"
-                          }`;
+                          case "Discussion": {
+                            return {
+                              title: modItemName ?? content.title ?? "No title",
+                              notes: `## Info\n\
+                              \n\
+                              - Type: Discussion`,
+                            };
+                          }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
-                        }
+                          case "ExternalTool": {
+                            const { description, name, url } = content;
 
-                        case "ExternalTool": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.name ?? "No name"
-                          }`;
+                            return {
+                              title: modItemName ?? name ?? "No name",
+                              notes: `## Info\n\
+                              \n\
+                              ${description ?? "No description provided"}\n\
+                              \n\
+                              - Type: External Tool\n\
+                              - Url: ${url ?? "None provided"}`,
+                            };
+                          }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
-                        }
+                          case "ExternalUrl": {
+                            const { extUrl } = content;
 
-                        case "ExternalUrl": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.title ?? "No title"
-                          }`;
+                            return {
+                              title: modItemName ?? content.title ?? "No title",
+                              notes: `## Info\n\
+                              \n\
+                              - Type: External Url\n\
+                              - Url: ${extUrl ?? "None provided"}`,
+                            };
+                          }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
-                        }
+                          case "File": {
+                            const { contentType, url } = content;
 
-                        case "File": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.id
-                          }`;
+                            return {
+                              title: modItemName ?? `File #${content.id}`,
+                              notes: `## Info\n\
+                              \n\
+                              - Type: File\n\
+                              - Content type: ${contentType ?? "Unknown"}\n\
+                              - Url: ${url ?? "None provided"}`,
+                            };
+                          }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
-                        }
+                          case "ModuleExternalTool": {
+                            const { modUrl } = content;
 
-                        case "ModuleExternalTool": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.id
-                          }`;
+                            return {
+                              title:
+                                modItemName ??
+                                `Module External Tool #${content.id}`,
+                              notes: `## Info\n\
+                              \n\
+                              - Type: Module External Tool\n\
+                              - Url: ${modUrl ?? "None provided"}`,
+                            };
+                          }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
-                        }
+                          case "Page": {
+                            const { createdAt, updatedAt } = content;
 
-                        case "Page": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.title ?? "No title"
-                          }`;
+                            return {
+                              title: modItemName ?? content.title ?? "No title",
+                              notes: `## Info\n\
+                              \n\
+                              - Type: Page\n\
+                              - Created at: ${naturalFormatDate(createdAt)}\n\
+                              - Last updated ${naturalFormatDate(updatedAt)}`,
+                            };
+                          }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
-                        }
+                          case "Quiz": {
+                            const { createdAt, updatedAt } = content;
 
-                        case "Quiz": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.id
-                          }`;
+                            return {
+                              title: modItemName ?? `${content.id}`,
+                              notes: `## Info\n\
+                              \n\
+                              - Type: Quiz\n\
+                              - Created at: ${naturalFormatDate(createdAt)}\n\
+                              - Last updated ${naturalFormatDate(updatedAt)}`,
+                            };
+                          }
 
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
-                        }
-
-                        case "SubHeader": {
-                          const title = `${content.type}: ${
-                            modItemName ?? content.title ?? "No title"
-                          }`;
-
-                          return {
-                            type: "to-do",
-                            operation: "create",
-                            attributes: { title },
-                          };
+                          case "SubHeader": {
+                            return {
+                              title: modItemName ?? content.title ?? "No title",
+                            };
+                          }
                         }
                       }
                     },
