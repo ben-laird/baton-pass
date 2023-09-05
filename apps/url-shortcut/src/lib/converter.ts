@@ -45,11 +45,11 @@ export function convert(a: ConvertIn): Schema {
 
           notes: compose([
             "## Info",
-            "\n",
+            null,
             `- Course id: ${courseId}`,
-            "\n",
+            null,
             "## Syllabus",
-            "\n",
+            null,
             syllabusBody ?? "No syllabus provided",
           ]),
         };
@@ -162,11 +162,11 @@ export function convert(a: ConvertIn): Schema {
 
                             return compose([
                               `${title ?? "Unknown title"}`,
-                              "\n",
+                              null,
                               `- Points possible: ${
                                 pointsPossible ?? "unknown"
                               }`,
-                              "\n",
+                              null,
                               formattedCriteria,
                             ]);
                           });
@@ -175,9 +175,9 @@ export function convert(a: ConvertIn): Schema {
                             title: name ?? "No name",
                             notes: compose([
                               "## Info",
-                              "\n",
+                              null,
                               description ?? "No description provided",
-                              "\n",
+                              null,
                               "- Type: Assignment",
                               `- Points possible: ${
                                 pointsPossible ?? "unknown"
@@ -185,9 +185,9 @@ export function convert(a: ConvertIn): Schema {
                               `- Url: ${url ?? "none"}`,
                               `- Created at: ${naturalFormatDate(createdAt)}`,
                               `- Last updated ${naturalFormatDate(updatedAt)}`,
-                              "\n",
+                              null,
                               "## Rubric",
-                              "\n",
+                              null,
                               rubric,
                             ]),
                             deadline: dueAt ?? undefined,
@@ -202,9 +202,9 @@ export function convert(a: ConvertIn): Schema {
                             title: name ?? "No name",
                             notes: compose([
                               "## Info",
-                              "\n",
+                              null,
                               description ?? "No description provided",
-                              "\n",
+                              null,
                               "- Type: External Tool",
                               `- Url: ${url ?? "None provided"}`,
                             ]),
@@ -218,7 +218,7 @@ export function convert(a: ConvertIn): Schema {
                             title: content.title ?? "No title",
                             notes: compose([
                               "## Info",
-                              "\n",
+                              null,
                               "- Type: External Url",
                               `- Url: ${extUrl ?? "None provided"}`,
                             ]),
@@ -232,7 +232,7 @@ export function convert(a: ConvertIn): Schema {
                             title: `File #${content.id}`,
                             notes: compose([
                               "## Info",
-                              "\n",
+                              null,
                               "- Type: File",
                               `- Content type: ${contentType ?? "Unknown"}`,
                               `- Url: ${url ?? "None provided"}`,
@@ -245,10 +245,12 @@ export function convert(a: ConvertIn): Schema {
 
                           return {
                             title: `Module External Tool #${content.id}`,
-                            notes: `## Info\n\
-                              \n\
-                              - Type: Module External Tool\n\
-                              - Url: ${modUrl ?? "None provided"}`,
+                            notes: compose([
+                              "## Info",
+                              null,
+                              "- Type: Module External Tool",
+                              `- Url: ${modUrl ?? "None provided"}`,
+                            ]),
                           };
                         }
 
@@ -259,7 +261,7 @@ export function convert(a: ConvertIn): Schema {
                             title: content.title ?? "No title",
                             notes: compose([
                               "## Info",
-                              "\n",
+                              null,
                               "- Type: Page",
                               `- Created at: ${naturalFormatDate(createdAt)}`,
                               `- Last updated ${naturalFormatDate(updatedAt)}`,
@@ -304,8 +306,8 @@ function expr<T>(lam: () => T): T {
   return lam();
 }
 
-function compose(lines: string[]) {
-  return lines.join("\n");
+function compose(lines: (string | null)[]) {
+  return lines.map((line) => line ?? "").join("\n");
 }
 
 type Nullish<T> = T | null | undefined;
