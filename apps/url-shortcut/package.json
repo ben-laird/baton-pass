@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@baton-pass/gql-canvas": "workspace:^",
+    "axios": "^1.5.0",
     "chrono-node": "^2.6.4",
     "date-fns": "^2.30.0",
     "graphql-request": "^6.1.0",

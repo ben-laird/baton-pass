@@ -1,3 +1,4 @@
+import axios from "axios";
 import { parseDate } from "chrono-node";
 import { format, parseISO } from "date-fns";
 import { z } from "zod";
@@ -217,3 +218,71 @@ export const thingsJsonSchema = z
   .transform((a) => new ShortcutURL("things:///json").addParams(a));
 
 export type ThingsJsonSchema = z.input<typeof thingsJsonSchema>;
+
+// REST initial data logic
+
+const userSchema = z.object({
+  id: z.number(),
+  // name: z.string(),
+  // created_at: z.string().datetime(),
+  // sortable_name: z.string(),
+  // short_name: z.string(),
+  // avatar_url: z.string().url(),
+  // last_name: z.string(),
+  // first_name: z.string(),
+  // locale: z.string().nullable(),
+  // effective_locale: z.string(),
+  // permissions: z.object({
+  //   can_update_name: z.boolean(),
+  //   can_update_avatar: z.boolean(),
+  //   limit_parent_app_web_access: z.boolean(),
+  // }),
+});
+
+const termsSchema = z.object({
+  enrollment_terms: z
+    .object({
+      id: z.number(),
+      name: z.string(),
+      start_at: z.string().datetime(),
+      end_at: z.string().datetime(),
+      created_at: z.string().datetime(),
+      workflow_state: z.enum(["active", "deleted"]),
+      grading_period_group_id: z.number(),
+      sis_term_id: z.number().nullable(),
+      overrides: z.object({
+        StudentEnrollment: z.object({
+          start_at: z.string().datetime(),
+          end_at: z.string().datetime(),
+        }),
+        TeacherEnrollment: z.object({
+          start_at: z.string().datetime().nullable(),
+          end_at: z.string().datetime().nullable(),
+        }),
+      }),
+    })
+    .array(),
+});
+
+export async function getInitialData(params?: { token: string }) {
+  const rest = axios.create({
+    baseURL: "https://canvas.liberty.edu/api/v1/",
+    headers: { Authorization: `Bearer ${params ? params.token : "NO_TOKEN"}` },
+  });
+
+  const userRes = await rest.request({
+    url: "/users/self",
+    method: "GET",
+  });
+
+  const { id } = userSchema.parse(userRes.data);
+
+  const termRes = await rest.request({
+    url: `/accounts/${id}/terms`,
+    method: "GET",
+  });
+
+  const { enrollment_terms: terms } = termsSchema.parse(termRes.data);
+
+  return { id, terms };
+}

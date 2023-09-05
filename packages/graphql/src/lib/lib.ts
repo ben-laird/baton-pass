@@ -1,4 +1,4 @@
-import { GraphQLClient, Variables } from "graphql-request";
+import { GraphQLClient, type Variables } from "graphql-request";
 import { z } from "zod";
 
 export class GraphQLRequestNoParams<T> {
@@ -20,7 +20,7 @@ export type GraphQLRequest<T = unknown, V = unknown> =
   | GraphQLRequestWithParams<T, V>;
 
 // rome-ignore lint/suspicious/noExplicitAny: should only be used in generics
-export  type AnyGraphQLRequest = GraphQLRequest<any, any>;
+export type AnyGraphQLRequest = GraphQLRequest<any, any>;
 
 export interface GraphQLSchemaNoParams {
   params: false;
@@ -128,9 +128,9 @@ export function queryGraphQL<P extends Variables, R>(params: QueryGQL<P, R>) {
   if (req instanceof GraphQLRequestNoParams) {
     return {
       async fire() {
-        const reqBody = req.body();
+        const { q } = req.body();
 
-        return req.parser(await client.request(reqBody.q));
+        return req.parser(await client.request(q));
       },
     };
   }

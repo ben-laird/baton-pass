@@ -1,15 +1,15 @@
-import { z } from "zod";
 import { writeFile } from "node:fs/promises";
+import { z } from "zod";
 
-import * as B from "@baton-pass/gql-canvas";
+import { Baton } from "@baton-pass/gql-canvas";
 
 import { convert, query, schema } from "./converter";
+// import { getInitialData, guarantee } from "./lib";
 
 const env = {
   ...z
     .object({
       CANVAS_AUTH_TOKEN: z.string(),
-      USER_ID: z.coerce.number(),
       ENDPOINT: z
         .string()
         .url()
@@ -24,13 +24,15 @@ const env = {
  * @returns an integer representing the exit code of the program
  */
 export async function main(): Promise<number> {
-  const { fire } = B.queryGraphQL({
+  // const { terms } = await getInitialData({ token: env.CANVAS_AUTH_TOKEN });
+
+  const { fire } = Baton.queryGraphQL({
     token: env.CANVAS_AUTH_TOKEN,
     endpoint: env.ENDPOINT,
     query,
   });
 
-  const res = await fire({ id: env.USER_ID });
+  const res = await fire({ courseId: 497698 }); // CSCN 112 course code
 
   if (!res.success) {
     console.error("Fire unsuccessful!\n");
@@ -40,7 +42,11 @@ export async function main(): Promise<number> {
 
   const url = schema.parse(convert(res.data));
 
-  await writeFile("./url.txt", url.href);
+  const filePath = "./url.txt";
+
+  await writeFile(filePath, url.href);
+
+  console.log(`File ${filePath} created!`);
 
   return 0;
 }

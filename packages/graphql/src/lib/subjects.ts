@@ -396,10 +396,11 @@ export const subjectCodes = [
   "WRIT",
   "WRSP",
   "YOUT", // 190
-  "CSER",
 ] as const;
+
+const extraSubjects = ["CSER", "LUIX"];
 
 /**
  * A pre-fabricated Zod validator for subject codes
  */
-export const subjectCodesVal = z.enum(subjectCodes);
+export const subjectCodesVal = z.enum([...subjectCodes, ...extraSubjects]);
