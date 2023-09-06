@@ -1,10 +1,7 @@
 import { z } from "zod";
 import { format } from "date-fns";
 
-import {
-  type QueryReturn,
-  singleCourseQuery as query,
-} from "@baton-pass/gql-canvas";
+import { type QueryReturn, finalQuery as query } from "@baton-pass/gql-canvas";
 export { query };
 
 import * as Lib from "./lib";
@@ -25,8 +22,8 @@ export function convert(a: ConvertIn): Schema {
   return {
     data: Lib.assertNonEmpty({
       array: Lib.guarantee({
-        value: a ? [a] : null, // In order to not change the logic much, I put the one course in an array
-      }).flatMap<ProjectSchema>((course) => {
+        value: a.Model?.enrollments,
+      }).flatMap<ProjectSchema>(({ course }) => {
         const {
           id: courseId,
           name: n,
