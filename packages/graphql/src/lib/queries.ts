@@ -186,6 +186,8 @@ export const finalQuery = Graph.schemaToSafeRequest({
                         ...ExtUrlFragment
                         ...ModuleExtToolFragment
                         ...ExtToolFragment
+                        ...QuizFragment
+                        ...DiscussionFragment
                       }
                     }
                   }
@@ -230,8 +232,7 @@ export const finalQuery = Graph.schemaToSafeRequest({
                                 entries: true,
                               }),
                             ])
-                            .nullable()
-                            .catch(null),
+                            .nullable(),
                         })
                         .array()
                         .nullable(),
