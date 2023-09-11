@@ -4,7 +4,7 @@ import { z } from "zod";
 import { Baton } from "@baton-pass/gql-canvas";
 
 import { convert, query, schema } from "./converter";
-// import { getInitialData, guarantee } from "./lib";
+import { getInitialData } from "./lib";
 
 const env = {
   ...z
@@ -24,15 +24,14 @@ const env = {
  * @returns an integer representing the exit code of the program
  */
 export async function main(): Promise<number> {
-  // const { terms } = await getInitialData({ token: env.CANVAS_AUTH_TOKEN });
+  const { id: userId } = await getInitialData({ token: env.CANVAS_AUTH_TOKEN });
 
-  const { fire } = Baton.queryGraphQL({
+  const res = await Baton.queryGraphQL({
     token: env.CANVAS_AUTH_TOKEN,
     endpoint: env.ENDPOINT,
     query,
-  });
-
-  const res = await fire({ courseId: 497698 }); // CSCN 112 course code
+  }).fire({ userId, courseId: 37379 });
+  // CSCN 112 course code: 497698; CASAS tutoring course code: 37379
 
   if (!res.success) {
     console.error("Fire unsuccessful!\n");

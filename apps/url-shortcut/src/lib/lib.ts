@@ -239,31 +239,6 @@ const userSchema = z.object({
   // }),
 });
 
-const termsSchema = z.object({
-  enrollment_terms: z
-    .object({
-      id: z.number(),
-      name: z.string(),
-      start_at: z.string().datetime(),
-      end_at: z.string().datetime(),
-      created_at: z.string().datetime(),
-      workflow_state: z.enum(["active", "deleted"]),
-      grading_period_group_id: z.number(),
-      sis_term_id: z.number().nullable(),
-      overrides: z.object({
-        StudentEnrollment: z.object({
-          start_at: z.string().datetime(),
-          end_at: z.string().datetime(),
-        }),
-        TeacherEnrollment: z.object({
-          start_at: z.string().datetime().nullable(),
-          end_at: z.string().datetime().nullable(),
-        }),
-      }),
-    })
-    .array(),
-});
-
 export async function getInitialData(params?: { token: string }) {
   const rest = axios.create({
     baseURL: "https://canvas.liberty.edu/api/v1/",
@@ -275,14 +250,5 @@ export async function getInitialData(params?: { token: string }) {
     method: "GET",
   });
 
-  const { id } = userSchema.parse(userRes.data);
-
-  const termRes = await rest.request({
-    url: `/accounts/${id}/terms`,
-    method: "GET",
-  });
-
-  const { enrollment_terms: terms } = termsSchema.parse(termRes.data);
-
-  return { id, terms };
+  return userSchema.parse(userRes.data);
 }
