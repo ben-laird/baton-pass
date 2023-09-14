@@ -1,4 +1,4 @@
-import axios from "axios";
+import { Axios } from "axios";
 import { parseDate } from "chrono-node";
 import { format, parseISO } from "date-fns";
 import { z } from "zod";
@@ -240,15 +240,12 @@ const userSchema = z.object({
 });
 
 export async function getInitialData(params?: { token: string }) {
-  const rest = axios.create({
+  const rest = new Axios({
     baseURL: "https://canvas.liberty.edu/api/v1/",
-    headers: { Authorization: `Bearer ${params ? params.token : "NO_TOKEN"}` },
+    headers: params ? { Authorization: `Bearer ${params.token}` } : undefined,
   });
 
-  const userRes = await rest.request({
-    url: "/users/self",
-    method: "GET",
-  });
+  const { data } = await rest.get("/users/self");
 
-  return userSchema.parse(userRes.data);
+  return userSchema.parse(data);
 }
