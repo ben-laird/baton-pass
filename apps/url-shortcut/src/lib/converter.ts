@@ -66,6 +66,8 @@ export function convert(a: ConvertIn): Schema {
           };
         }
 
+        // T-15 Add in call to Canvas REST for quizzes to attach them to modules
+
         type ModSchema = NonNullable<
           Determine<
             ProjectSchema,
@@ -122,13 +124,14 @@ export function convert(a: ConvertIn): Schema {
                       ? { type: "to-do", operation: "create", attributes }
                       : [];
 
+                    // T-14 Properly type content in order to refactor out moduleItemConvert
                     function moduleItemConvert(): ModuleItemAttributes | null {
                       // Switching based upon module item content type to customize to-do
 
                       switch (content.type) {
                         case "Assignment": {
                           const {
-                            description,
+                            description, // T-16 Convert description from HTML to Markdown, probably using [turndown](https://www.npmjs.com/package/turndown)
                             name,
                             pointsPossible,
                             createdAt,
@@ -312,5 +315,5 @@ type Nullish<T> = T | null | undefined;
 function naturalFormatDate(date: Nullish<Date>) {
   if (!date) return "Unknown";
 
-  return format(date, "MMMM do, y at h aaa");
+  return format(date, "MMMM do, y, h aaa");
 }
