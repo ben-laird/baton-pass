@@ -198,20 +198,16 @@ function moduleItemConvert(content: Content): ModuleItemAttributes | null {
 
         const { title, pointsPossible, criteria } = nullishRubric;
 
-        const formattedCriteria = compose(
-          criteria.map(({ longDescription, points }) => {
-            return `${
-              points ?? "Unknown number of"
-            } point(s) - ${longDescription ?? "No description provided"}`;
-          }),
-        );
-
         return compose([
           `${title ?? "Unknown title"}`,
           null,
           `- Points possible: ${pointsPossible ?? "unknown"}`,
           null,
-          formattedCriteria,
+          ...criteria.map(({ longDescription: desc, points }) => {
+            return `${
+              points ?? "Unknown number of"
+            } point(s) - ${desc ?? "No description provided"}`;
+          }),
         ]);
       });
 
